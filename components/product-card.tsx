@@ -32,17 +32,14 @@ export function ProductCard({ product }: { product: Product }) {
       </div>
 
       <div className="mt-3 space-y-1">
-        <p className="text-xs font-semibold text-muted-foreground">{product.brandTag}</p>
+        <p className="text-xs font-semibold text-muted-foreground">
+          {product.brandTag}
+        </p>
         <h3 className="text-sm font-medium leading-snug line-clamp-2 group-hover:text-primary transition-colors">
           {product.title}
         </h3>
         <div className="flex items-center gap-2 pt-1">
           <span className="text-sm font-bold">{formatPKR(product.price)}</span>
-          {product.originalPrice && (
-            <span className="text-xs text-muted-foreground line-through">
-              {formatPKR(product.originalPrice)}
-            </span>
-          )}
         </div>
       </div>
     </Link>

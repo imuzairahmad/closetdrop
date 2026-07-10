@@ -20,8 +20,6 @@ export interface Product {
   authenticity: string;
   description: string;
   price: number;
-  originalPrice?: number;
-  priceLabel: string;
   images: ProductImage[];
   featured?: boolean;
   sold?: boolean;

@@ -17,7 +17,6 @@ const MOCK_PRODUCTS: Product[] = [
     description:
       "A clean pair of Nike Epic React Flyknit 2s, thrifted and checked for authenticity. Soft knit upper, React foam cushioning, barely-worn tread.",
     price: 3000,
-    priceLabel: "Final Fixed⚠️",
     images: [
       {
         url: "https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?q=80&w=1200&auto=format&fit=crop",
@@ -39,7 +38,6 @@ const MOCK_PRODUCTS: Product[] = [
     description:
       "Classic straight-leg Levi's 501s. Thrifted, washed, ready to wear. True vintage fade.",
     price: 2500,
-    priceLabel: "Final Fixed⚠️",
     images: [
       {
         url: "https://images.unsplash.com/photo-1541099649105-f69ad21f3246?q=80&w=1200&auto=format&fit=crop",
@@ -61,7 +59,6 @@ const MOCK_PRODUCTS: Product[] = [
     description:
       "Bold Cuban link chain, stainless steel so it won't fade or tarnish. Thrifted piece in excellent shape.",
     price: 1800,
-    priceLabel: "Final Fixed⚠️",
     images: [
       {
         url: "https://images.unsplash.com/photo-1611652022419-a9419f74343d?q=80&w=1200&auto=format&fit=crop",
@@ -83,7 +80,6 @@ const MOCK_PRODUCTS: Product[] = [
     description:
       "Oversized light-wash denim shirt, perfect for layering. Soft, broken-in fabric.",
     price: 1600,
-    priceLabel: "Final Fixed⚠️",
     images: [
       {
         url: "https://images.unsplash.com/photo-1594938298603-c8148c4dae35?q=80&w=1200&auto=format&fit=crop",
@@ -104,7 +100,6 @@ const MOCK_PRODUCTS: Product[] = [
     description:
       "Vintage-style graphic tee, soft cotton, slightly faded print for that lived-in look.",
     price: 1200,
-    priceLabel: "Final Fixed⚠️",
     images: [
       {
         url: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?q=80&w=1200&auto=format&fit=crop",
@@ -125,7 +120,6 @@ const MOCK_PRODUCTS: Product[] = [
     description:
       "High-waisted mom jeans with a relaxed fit through the leg. Timeless thrifted staple.",
     price: 2200,
-    priceLabel: "Final Fixed⚠️",
     images: [
       {
         url: "https://images.unsplash.com/photo-1582552938357-32b906df40cb?q=80&w=1200&auto=format&fit=crop",
@@ -156,8 +150,7 @@ function mapEntryToProduct(entry: any): Product {
     authenticity: f.authenticity,
     description: f.description,
     price: f.price,
-    originalPrice: f.originalPrice,
-    priceLabel: f.priceLabel || "Final Fixed⚠️",
+
     images: images.length
       ? images
       : [{ url: "/placeholder.jpg", alt: f.title }],

@@ -67,15 +67,7 @@ export default async function ProductPage({
             <span className="text-3xl font-black">
               {formatPKR(product.price)}
             </span>
-            {product.originalPrice && (
-              <span className="text-lg text-muted-foreground line-through">
-                {formatPKR(product.originalPrice)}
-              </span>
-            )}
           </div>
-          {/* <p className="text-xs font-semibold text-red-600 mt-1 uppercase tracking-wide">
-            {product.priceLabel}
-          </p> */}
 
           <div className="mt-6 space-y-3 border-y border-border py-6">
             <div className="flex items-start gap-3 text-sm">

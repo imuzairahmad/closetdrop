@@ -161,6 +161,7 @@ function mapEntryToProduct(entry: any): Product {
 
 export async function getAllProducts(): Promise<Product[]> {
   if (!isContentfulConfigured || !contentfulClient) {
+    console.warn("⚠️ Contentful NOT configured — serving mock data");
     return MOCK_PRODUCTS;
   }
 
@@ -169,9 +170,13 @@ export async function getAllProducts(): Promise<Product[]> {
       content_type: "product",
       order: ["-sys.createdAt"] as any,
     });
+    console.log(`✅ Contentful returned ${entries.items.length} products`);
     return entries.items.map(mapEntryToProduct);
   } catch (err) {
-    console.error("Contentful fetch failed, falling back to mock data:", err);
+    console.error(
+      "❌ Contentful fetch failed, falling back to mock data:",
+      err,
+    );
     return MOCK_PRODUCTS;
   }
 }

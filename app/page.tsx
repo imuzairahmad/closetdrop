@@ -4,7 +4,7 @@ import { Button, buttonVariants } from "@/components/ui/button";
 import { ProductCard } from "@/components/product-card";
 import { getFeaturedProducts } from "@/lib/products";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 60;
 // https:alt="Women's Collection" //images.unsplash.com/photo-1524504388940-b1c1722653e1?q=80&w=1200&auto=format&fit=crop
 
 export default async function HomePage() {

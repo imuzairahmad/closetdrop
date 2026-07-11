@@ -1,6 +1,7 @@
 import { getProductsByCategory } from "@/lib/products";
 import { ProductGrid } from "@/components/product-grid";
 import { SubCategory } from "@/types/product";
+export const revalidate = 60;
 
 export const metadata = {
   title: "Men's Collection — Closetdrop™️",
@@ -9,7 +10,7 @@ export const metadata = {
 export default async function MenPage() {
   const products = await getProductsByCategory("men");
   const availableSubCategories = Array.from(
-    new Set(products.map((p) => p.subCategory))
+    new Set(products.map((p) => p.subCategory)),
   ) as SubCategory[];
 
   return (
@@ -25,7 +26,10 @@ export default async function MenPage() {
         </p>
       </div>
 
-      <ProductGrid products={products} availableSubCategories={availableSubCategories} />
+      <ProductGrid
+        products={products}
+        availableSubCategories={availableSubCategories}
+      />
     </div>
   );
 }

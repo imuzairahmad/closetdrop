@@ -1,6 +1,7 @@
 import { getProductsByCategory } from "@/lib/products";
 import { ProductGrid } from "@/components/product-grid";
 import { SubCategory } from "@/types/product";
+export const revalidate = 60;
 
 export const metadata = {
   title: "Women's Collection — Closetdrop™️",
@@ -9,7 +10,7 @@ export const metadata = {
 export default async function WomenPage() {
   const products = await getProductsByCategory("women");
   const availableSubCategories = Array.from(
-    new Set(products.map((p) => p.subCategory))
+    new Set(products.map((p) => p.subCategory)),
   ) as SubCategory[];
 
   return (
@@ -18,14 +19,19 @@ export default async function WomenPage() {
         <p className="text-sm font-semibold uppercase tracking-[0.2em] text-muted-foreground mb-2">
           Closetdrop™️
         </p>
-        <h1 className="text-3xl md:text-4xl font-black tracking-tight">Women</h1>
+        <h1 className="text-3xl md:text-4xl font-black tracking-tight">
+          Women
+        </h1>
         <p className="text-muted-foreground mt-2 max-w-lg">
           Thrifted shoes, jeans &amp; shirts — verified authentic, condition
           checked, priced fixed.
         </p>
       </div>
 
-      <ProductGrid products={products} availableSubCategories={availableSubCategories} />
+      <ProductGrid
+        products={products}
+        availableSubCategories={availableSubCategories}
+      />
     </div>
   );
 }

@@ -1,17 +1,32 @@
-import { getProductsByCategory } from "@/lib/products";
+import {
+  getProductsByCategoryPaged,
+  getSubCategoriesForCategory,
+} from "@/lib/products";
 import { ProductGrid } from "@/components/product-grid";
-import { SubCategory } from "@/types/product";
+import { Pagination } from "@/components/pagination";
+
 export const revalidate = 60;
 
 export const metadata = {
   title: "Men's Collection — Closetdrop™️",
 };
 
-export default async function MenPage() {
-  const products = await getProductsByCategory("men");
-  const availableSubCategories = Array.from(
-    new Set(products.map((p) => p.subCategory)),
-  ) as SubCategory[];
+const PAGE_SIZE = 12;
+
+export default async function MenPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ page?: string }>;
+}) {
+  const { page: pageParam } = await searchParams;
+  const page = Math.max(1, Number(pageParam) || 1);
+
+  const [{ products, total }, availableSubCategories] = await Promise.all([
+    getProductsByCategoryPaged("men", page, PAGE_SIZE),
+    getSubCategoriesForCategory("men"),
+  ]);
+
+  const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
 
   return (
     <div className="container py-12">
@@ -30,6 +45,8 @@ export default async function MenPage() {
         products={products}
         availableSubCategories={availableSubCategories}
       />
+
+      <Pagination currentPage={page} totalPages={totalPages} basePath="/men" />
     </div>
   );
 }

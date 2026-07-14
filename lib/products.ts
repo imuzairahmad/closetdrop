@@ -1,5 +1,5 @@
 import { contentfulClient, isContentfulConfigured } from "./contentful";
-import { Product, Category } from "@/types/product";
+import { Product, Category, SubCategory } from "@/types/product";
 
 // Fallback demo data so the site renders immediately, before Contentful
 // is wired up. Once you add real entries in Contentful this is ignored.
@@ -130,7 +130,7 @@ const MOCK_PRODUCTS: Product[] = [
 ];
 
 function mapEntryToProduct(entry: any): Product {
-  const f = entry.fields;
+  const f = entry?.fields ?? {};
   const images = (f.images || []).map((img: any) => ({
     url: `https:${img.fields.file.url}`,
     alt: img.fields.title || f.title,
@@ -150,7 +150,6 @@ function mapEntryToProduct(entry: any): Product {
     authenticity: f.authenticity,
     description: f.description,
     price: f.price,
-
     images: images.length
       ? images
       : [{ url: "/placeholder.jpg", alt: f.title }],
@@ -170,7 +169,7 @@ export async function getAllProducts(): Promise<Product[]> {
       content_type: "product",
       order: ["-sys.createdAt"] as any,
     });
-    console.log(`✅ Contentful returned ${entries.items.length} products`);
+    // console.log(`✅ Contentful returned ${entries.items.length} products`);
     return entries.items.map(mapEntryToProduct);
   } catch (err) {
     console.error(
@@ -188,6 +187,185 @@ export async function getProductsByCategory(
   return all.filter((p) => p.category === category);
 }
 
+/**
+ * Paginated + server-side filtered fetch for category listing pages
+ * (/men, /women).
+ *
+ * Pushes `fields.category`, `limit`, and `skip` into the Contentful query
+ * itself instead of fetching every product for a category and slicing in
+ * memory. This matters once a category has hundreds of entries — without
+ * it, every visit to page 5 would still download every product for the
+ * category over the network just to throw most of it away.
+ */
+export async function getProductsByCategoryPaged(
+  category: Category,
+  page: number,
+  pageSize: number,
+): Promise<{ products: Product[]; total: number }> {
+  const safePage = Math.max(1, page);
+  const skip = (safePage - 1) * pageSize;
+
+  if (!isContentfulConfigured || !contentfulClient) {
+    console.warn("⚠️ Contentful NOT configured — serving mock data");
+    const filtered = MOCK_PRODUCTS.filter((p) => p.category === category);
+    return {
+      products: filtered.slice(skip, skip + pageSize),
+      total: filtered.length,
+    };
+  }
+
+  try {
+    const entries = await contentfulClient.getEntries({
+      content_type: "product",
+      "fields.category": category,
+      order: ["-sys.createdAt"] as any,
+      limit: pageSize,
+      skip,
+    } as any);
+
+    return {
+      products: entries.items.map(mapEntryToProduct),
+      total: entries.total,
+    };
+  } catch (err) {
+    console.error(
+      "❌ Contentful paged fetch failed, falling back to mock data:",
+      err,
+    );
+    const filtered = MOCK_PRODUCTS.filter((p) => p.category === category);
+    return {
+      products: filtered.slice(skip, skip + pageSize),
+      total: filtered.length,
+    };
+  }
+}
+
+/**
+ * Paginated fetch across ALL categories, for the /shop page.
+ * Same reasoning as getProductsByCategoryPaged — limit/skip pushed into
+ * the Contentful query rather than fetching everything and slicing.
+ */
+export async function getAllProductsPaged(
+  page: number,
+  pageSize: number,
+): Promise<{ products: Product[]; total: number }> {
+  const safePage = Math.max(1, page);
+  const skip = (safePage - 1) * pageSize;
+
+  if (!isContentfulConfigured || !contentfulClient) {
+    console.warn("⚠️ Contentful NOT configured — serving mock data");
+    return {
+      products: MOCK_PRODUCTS.slice(skip, skip + pageSize),
+      total: MOCK_PRODUCTS.length,
+    };
+  }
+
+  try {
+    const entries = await contentfulClient.getEntries({
+      content_type: "product",
+      order: ["-sys.createdAt"] as any,
+      limit: pageSize,
+      skip,
+    } as any);
+
+    return {
+      products: entries.items.map(mapEntryToProduct),
+      total: entries.total,
+    };
+  } catch (err) {
+    console.error(
+      "❌ Contentful paged fetch failed, falling back to mock data:",
+      err,
+    );
+    return {
+      products: MOCK_PRODUCTS.slice(skip, skip + pageSize),
+      total: MOCK_PRODUCTS.length,
+    };
+  }
+}
+
+/**
+ * Lightweight fetch of just the distinct subCategory values for a category,
+ * used to populate the filter pills/tabs on listing pages. Uses Contentful's
+ * `select` to pull only the one field instead of full entries (images,
+ * description, etc.), since the filter UI never needs that payload.
+ */
+/**
+ * Lightweight fetch of distinct subCategory values for a category, used to
+ * populate the filter pills/tabs on listing pages.
+ *
+ * NOTE: intentionally does NOT use Contentful's `select` param. With only
+ * one field selected, entries missing a value for that field can come back
+ * with `fields` omitted entirely (not just the field itself undefined),
+ * which crashed here previously. Fetching full entries and guarding with
+ * optional chaining is more robust for a catalog this size.
+ */
+export async function getSubCategoriesForCategory(
+  category: Category,
+): Promise<SubCategory[]> {
+  if (!isContentfulConfigured || !contentfulClient) {
+    const filtered = MOCK_PRODUCTS.filter((p) => p.category === category);
+    return Array.from(
+      new Set(filtered.map((p) => p.subCategory)),
+    ) as SubCategory[];
+  }
+
+  try {
+    const entries = await contentfulClient.getEntries({
+      content_type: "product",
+      "fields.category": category,
+      limit: 1000,
+    } as any);
+
+    const subCategories = entries.items
+      .map((entry: any) => entry?.fields?.subCategory)
+      .filter((sc: unknown): sc is SubCategory => Boolean(sc));
+
+    return Array.from(new Set(subCategories));
+  } catch (err) {
+    console.error(
+      "❌ Contentful subCategory fetch failed, falling back to mock data:",
+      err,
+    );
+    const filtered = MOCK_PRODUCTS.filter((p) => p.category === category);
+    return Array.from(
+      new Set(filtered.map((p) => p.subCategory)),
+    ) as SubCategory[];
+  }
+}
+
+/**
+ * Distinct subCategory values across all products (any category), for the
+ * /shop page's filter pills. See note above re: avoiding `select`.
+ */
+export async function getAllSubCategories(): Promise<SubCategory[]> {
+  if (!isContentfulConfigured || !contentfulClient) {
+    return Array.from(
+      new Set(MOCK_PRODUCTS.map((p) => p.subCategory)),
+    ) as SubCategory[];
+  }
+
+  try {
+    const entries = await contentfulClient.getEntries({
+      content_type: "product",
+      limit: 1000,
+    } as any);
+
+    const subCategories = entries.items
+      .map((entry: any) => entry?.fields?.subCategory)
+      .filter((sc: unknown): sc is SubCategory => Boolean(sc));
+
+    return Array.from(new Set(subCategories));
+  } catch (err) {
+    console.error(
+      "❌ Contentful subCategory fetch failed, falling back to mock data:",
+      err,
+    );
+    return Array.from(
+      new Set(MOCK_PRODUCTS.map((p) => p.subCategory)),
+    ) as SubCategory[];
+  }
+}
 export async function getFeaturedProducts(): Promise<Product[]> {
   const all = await getAllProducts();
   const featured = all.filter((p) => p.featured);

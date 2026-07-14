@@ -1,11 +1,10 @@
 import Link from "next/link";
 import Image from "next/image";
-import { Button, buttonVariants } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button";
 import { ProductCard } from "@/components/product-card";
 import { getFeaturedProducts } from "@/lib/products";
 
 export const revalidate = 60;
-// https:alt="Women's Collection" //images.unsplash.com/photo-1524504388940-b1c1722653e1?q=80&w=1200&auto=format&fit=crop
 
 export default async function HomePage() {
   const featured = await getFeaturedProducts();
@@ -20,6 +19,7 @@ export default async function HomePage() {
             alt="Closetdrop thrifted fashion"
             fill
             priority
+            sizes="100vw"
             className="object-cover opacity-70"
           />
           <div className="relative z-10 flex h-full flex-col items-start justify-end container pb-16 text-white">
@@ -59,10 +59,11 @@ export default async function HomePage() {
             className="group relative aspect-[16/9] md:aspect-[4/5] overflow-hidden rounded-lg"
           >
             <Image
-              src="https://images.unsplash.com/photo-1584917865442-de89df76afd3?q=80&w=1200&auto=format&fit=crop"
+              src="https://images.ctfassets.net/0cyvvzkg0flt/4NnKjG18FnWEzGZKGrw5AG/a6696c3baa0d4c3901415a5a38c7d33b/WhatsApp_Image_2026-07-14_at_10.08.21_PM.jpeg?w=800&h=1000&fit=fill&f=bottom&q=90"
               alt="Women's Collection"
               fill
-              className="object-cover transition-transform duration-500 group-hover:scale-105"
+              sizes="(max-width: 768px) 100vw, 50vw"
+              className="object-cover  transition-transform duration-500 group-hover:scale-105"
             />
             <div className="absolute inset-0 bg-black/30 flex items-end p-6">
               <span className="text-white text-2xl font-black tracking-tight">
@@ -75,9 +76,10 @@ export default async function HomePage() {
             className="group relative aspect-[16/9] md:aspect-[4/5] overflow-hidden rounded-lg"
           >
             <Image
-              src="https://images.unsplash.com/photo-1490114538077-0a7f8cb49891?q=80&w=1200&auto=format&fit=crop"
+              src="https://images.ctfassets.net/0cyvvzkg0flt/7cySoII3cLNAVDSgAOvST7/474a6543082067e4cd0d33418e6b26fc/WhatsApp_Image_2026-07-14_at_8.29.25_PM.jpeg?w=800&h=1000&fit=fill&f=bottom&q=90"
               alt="Men's Collection"
               fill
+              sizes="(max-width: 768px) 100vw, 50vw"
               className="object-cover transition-transform duration-500 group-hover:scale-105"
             />
             <div className="absolute inset-0 bg-black/30 flex items-end p-6">
@@ -93,16 +95,24 @@ export default async function HomePage() {
       <section className="container pb-24">
         <div className="flex items-center justify-between mb-8">
           <h2 className="text-2xl font-black tracking-tight">Fresh Drops</h2>
+          {/* FIXED: was hardcoded to /women, which is wrong since featured
+              products span both categories. Point to a combined shop page. */}
           <Link
-            href="/women"
+            href="/shop"
             className="text-sm font-semibold underline underline-offset-4"
           >
             View all
           </Link>
         </div>
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-4 gap-y-10">
-          {featured.map((product) => (
-            <ProductCard key={product.id} product={product} />
+          {featured.map((product, i) => (
+            <ProductCard
+              key={product.id}
+              product={product}
+              // only priority-load the first row so LCP isn't spent on
+              // offscreen images
+              priority={i < 4}
+            />
           ))}
         </div>
       </section>

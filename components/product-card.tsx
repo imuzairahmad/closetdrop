@@ -4,7 +4,12 @@ import { Product } from "@/types/product";
 import { Badge } from "@/components/ui/badge";
 import { formatPKR } from "@/lib/utils";
 
-export function ProductCard({ product }: { product: Product }) {
+interface ProductCardProps {
+  product: Product;
+  priority?: boolean;
+}
+
+export function ProductCard({ product, priority = false }: ProductCardProps) {
   const img = product.images[0];
 
   return (
@@ -14,6 +19,7 @@ export function ProductCard({ product }: { product: Product }) {
           src={img.url}
           alt={img.alt}
           fill
+          priority={priority}
           sizes="(max-width: 768px) 50vw, 25vw"
           className="object-cover transition-transform duration-500 group-hover:scale-105"
         />

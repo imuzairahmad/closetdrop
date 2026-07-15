@@ -1,6 +1,5 @@
-import { getAllProductsPaged, getAllSubCategories } from "@/lib/products";
+import { getAllProducts, getAllSubCategories } from "@/lib/products";
 import { ProductGrid } from "@/components/product-grid";
-import { Pagination } from "@/components/pagination";
 
 export const revalidate = 60;
 
@@ -8,22 +7,11 @@ export const metadata = {
   title: "Shop All — Closetdrop™️",
 };
 
-const PAGE_SIZE = 12;
-
-export default async function ShopPage({
-  searchParams,
-}: {
-  searchParams: Promise<{ page?: string }>;
-}) {
-  const { page: pageParam } = await searchParams;
-  const page = Math.max(1, Number(pageParam) || 1);
-
-  const [{ products, total }, availableSubCategories] = await Promise.all([
-    getAllProductsPaged(page, PAGE_SIZE),
+export default async function ShopPage() {
+  const [products, availableSubCategories] = await Promise.all([
+    getAllProducts(),
     getAllSubCategories(),
   ]);
-
-  const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
 
   return (
     <div className="container py-12">
@@ -44,8 +32,6 @@ export default async function ShopPage({
         products={products}
         availableSubCategories={availableSubCategories}
       />
-
-      <Pagination currentPage={page} totalPages={totalPages} basePath="/shop" />
     </div>
   );
 }

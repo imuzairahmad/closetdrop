@@ -1,15 +1,14 @@
 import Link from "next/link";
 import { FaInstagram, FaWhatsapp } from "react-icons/fa";
+import Logo from "./logo";
 
 export function Footer() {
   return (
     <footer className="border-t border-border mt-24">
       <div className="container py-12 grid grid-cols-1 md:grid-cols-3 gap-8">
         <div>
-          <h3 className="text-lg font-black tracking-tight mb-2">
-            CLOSETDROP<span className="text-primary">™️</span>
-          </h3>
-          <p className="text-sm text-muted-foreground max-w-xs">
+          <Logo />
+          <p className="text-sm text-muted-foreground max-w-xs mt-1">
             Thrifted fashion, verified authentic. Showcasing one-of-one pieces
             for men &amp; women — shoes, jeans, shirts, and jewelry for men.
           </p>

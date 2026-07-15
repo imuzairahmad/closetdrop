@@ -1,5 +1,8 @@
 export type Category = "women" | "men";
+
 export type SubCategory = "shoes" | "jeans" | "shirts" | "jewelry";
+
+export type SizeStandard = "US" | "UK" | "EU";
 
 export interface ProductImage {
   url: string;

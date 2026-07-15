@@ -1,3 +1,4 @@
+import Logo from "@/components/logo";
 import { ContactForm } from "./contact-form";
 import { Instagram, MessageCircle, MapPin } from "lucide-react";
 
@@ -8,10 +9,8 @@ export const metadata = {
 export default function ContactPage() {
   return (
     <div className="container py-16">
-      <div className="max-w-2xl mx-auto text-center mb-12">
-        <p className="text-sm font-semibold uppercase tracking-[0.2em] text-muted-foreground mb-2">
-          Closetdrop™️
-        </p>
+      <div className="max-w-2xl flex flex-col items-center mx-auto text-center mb-12">
+        <Logo />
         <h1 className="text-3xl md:text-4xl font-black tracking-tight">
           Get in Touch
         </h1>

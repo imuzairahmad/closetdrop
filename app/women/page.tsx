@@ -1,7 +1,8 @@
-import { getProductsByCategory } from "@/lib/products";
+import {
+  getProductsByCategory,
+  getSubCategoriesForCategory,
+} from "@/lib/products";
 import { ProductGrid } from "@/components/product-grid";
-import { Pagination } from "@/components/pagination";
-import { SubCategory } from "@/types/product";
 
 export const revalidate = 60;
 
@@ -9,26 +10,11 @@ export const metadata = {
   title: "Women's Collection — Closetdrop™️",
 };
 
-const PAGE_SIZE = 12;
-
-export default async function WomenPage({
-  searchParams,
-}: {
-  searchParams: Promise<{ page?: string }>;
-}) {
-  const { page: pageParam } = await searchParams;
-  const page = Math.max(1, Number(pageParam) || 1);
-
-  const allProducts = await getProductsByCategory("women");
-
-  const availableSubCategories = Array.from(
-    new Set(allProducts.map((p) => p.subCategory)),
-  ) as SubCategory[];
-
-  const totalPages = Math.max(1, Math.ceil(allProducts.length / PAGE_SIZE));
-  const currentPage = Math.min(page, totalPages);
-  const start = (currentPage - 1) * PAGE_SIZE;
-  const products = allProducts.slice(start, start + PAGE_SIZE);
+export default async function WomenPage() {
+  const [products, availableSubCategories] = await Promise.all([
+    getProductsByCategory("women"),
+    getSubCategoriesForCategory("women"),
+  ]);
 
   return (
     <div className="container py-12">
@@ -48,12 +34,6 @@ export default async function WomenPage({
       <ProductGrid
         products={products}
         availableSubCategories={availableSubCategories}
-      />
-
-      <Pagination
-        currentPage={currentPage}
-        totalPages={totalPages}
-        basePath="/women"
       />
     </div>
   );

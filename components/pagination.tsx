@@ -1,23 +1,20 @@
-import Link from "next/link";
+"use client";
 
 interface PaginationProps {
   currentPage: number;
   totalPages: number;
-  basePath: string;
+  onPageChange: (page: number) => void;
 }
 
 export function Pagination({
   currentPage,
   totalPages,
-  basePath,
+  onPageChange,
 }: PaginationProps) {
   if (totalPages <= 1) return null;
 
   const prevPage = Math.max(1, currentPage - 1);
   const nextPage = Math.min(totalPages, currentPage + 1);
-
-  // Compact page list: always show first, last, current, and one neighbor
-  // each side — collapses long ranges with "…" instead of rendering every page.
   const pages = getVisiblePages(currentPage, totalPages);
 
   return (
@@ -25,9 +22,10 @@ export function Pagination({
       aria-label="Pagination"
       className="flex items-center justify-center gap-2 mt-12"
     >
-      <Link
-        href={`${basePath}?page=${prevPage}`}
-        aria-disabled={currentPage === 1}
+      <button
+        type="button"
+        onClick={() => onPageChange(prevPage)}
+        disabled={currentPage === 1}
         className={`px-3 py-2 text-sm font-semibold rounded-md border ${
           currentPage === 1
             ? "pointer-events-none opacity-40"
@@ -35,7 +33,7 @@ export function Pagination({
         }`}
       >
         Prev
-      </Link>
+      </button>
 
       {pages.map((p, i) =>
         p === "..." ? (
@@ -46,9 +44,10 @@ export function Pagination({
             …
           </span>
         ) : (
-          <Link
+          <button
+            type="button"
             key={p}
-            href={`${basePath}?page=${p}`}
+            onClick={() => onPageChange(p)}
             aria-current={p === currentPage ? "page" : undefined}
             className={`px-3 py-2 text-sm font-semibold rounded-md border ${
               p === currentPage
@@ -57,13 +56,14 @@ export function Pagination({
             }`}
           >
             {p}
-          </Link>
+          </button>
         ),
       )}
 
-      <Link
-        href={`${basePath}?page=${nextPage}`}
-        aria-disabled={currentPage === totalPages}
+      <button
+        type="button"
+        onClick={() => onPageChange(nextPage)}
+        disabled={currentPage === totalPages}
         className={`px-3 py-2 text-sm font-semibold rounded-md border ${
           currentPage === totalPages
             ? "pointer-events-none opacity-40"
@@ -71,7 +71,7 @@ export function Pagination({
         }`}
       >
         Next
-      </Link>
+      </button>
     </nav>
   );
 }

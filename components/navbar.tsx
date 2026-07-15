@@ -5,6 +5,7 @@ import { useState } from "react";
 import { Menu, X, Instagram } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { FaInstagram, FaWhatsapp } from "react-icons/fa";
+import Logo from "./logo";
 
 const links = [
   { href: "/women", label: "Women" },
@@ -18,10 +19,8 @@ export function Navbar() {
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
       <div className="container flex h-16 items-center justify-between">
-        <Link href="/" className="text-xl font-black tracking-tight">
-          CLOSETDROP<span className="text-primary">™️</span>
-        </Link>
-
+        {/* CLOSETDROP<span className="text-primary">™️</span> */}
+        <Logo />
         <nav className="hidden md:flex items-center gap-8 text-sm font-semibold uppercase tracking-wide">
           {links.map((l) => (
             <Link

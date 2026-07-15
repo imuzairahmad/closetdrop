@@ -26,8 +26,17 @@ export default async function HomePage() {
             <p className="text-sm font-semibold uppercase tracking-[0.2em] mb-3 text-white/80">
               Verified Authentic · Thrifted
             </p>
-            <h1 className="text-4xl md:text-6xl font-black tracking-tight max-w-2xl leading-[1.05]">
-              CLOSETDROP™️
+            <h1 className="md:text-6xl max-w-2xl text-lg font-black tracking-tight leading-none">
+              <span>
+                CLOSET
+                <span className="relative inline-block text-[#7C5CFC]">
+                  DROP
+                  <span className="absolute -bottom-1 left-0 h-[3px] w-full bg-[#7C5CFC] rounded-full" />
+                  <span className="absolute -top-1 -right-4 md:-top-2 md:-right-6 text-sm md:text-xl">
+                    ✦
+                  </span>
+                </span>
+              </span>
             </h1>
             <p className="mt-4 max-w-md text-white/90 text-base">
               One-of-one thrifted pieces. Shoes, jeans, shirts &amp; jewelry —

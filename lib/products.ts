@@ -187,16 +187,6 @@ export async function getProductsByCategory(
   return all.filter((p) => p.category === category);
 }
 
-/**
- * Paginated + server-side filtered fetch for category listing pages
- * (/men, /women).
- *
- * Pushes `fields.category`, `limit`, and `skip` into the Contentful query
- * itself instead of fetching every product for a category and slicing in
- * memory. This matters once a category has hundreds of entries — without
- * it, every visit to page 5 would still download every product for the
- * category over the network just to throw most of it away.
- */
 export async function getProductsByCategoryPaged(
   category: Category,
   page: number,
@@ -240,11 +230,6 @@ export async function getProductsByCategoryPaged(
   }
 }
 
-/**
- * Paginated fetch across ALL categories, for the /shop page.
- * Same reasoning as getProductsByCategoryPaged — limit/skip pushed into
- * the Contentful query rather than fetching everything and slicing.
- */
 export async function getAllProductsPaged(
   page: number,
   pageSize: number,
@@ -284,22 +269,6 @@ export async function getAllProductsPaged(
   }
 }
 
-/**
- * Lightweight fetch of just the distinct subCategory values for a category,
- * used to populate the filter pills/tabs on listing pages. Uses Contentful's
- * `select` to pull only the one field instead of full entries (images,
- * description, etc.), since the filter UI never needs that payload.
- */
-/**
- * Lightweight fetch of distinct subCategory values for a category, used to
- * populate the filter pills/tabs on listing pages.
- *
- * NOTE: intentionally does NOT use Contentful's `select` param. With only
- * one field selected, entries missing a value for that field can come back
- * with `fields` omitted entirely (not just the field itself undefined),
- * which crashed here previously. Fetching full entries and guarding with
- * optional chaining is more robust for a catalog this size.
- */
 export async function getSubCategoriesForCategory(
   category: Category,
 ): Promise<SubCategory[]> {
@@ -334,10 +303,6 @@ export async function getSubCategoriesForCategory(
   }
 }
 
-/**
- * Distinct subCategory values across all products (any category), for the
- * /shop page's filter pills. See note above re: avoiding `select`.
- */
 export async function getAllSubCategories(): Promise<SubCategory[]> {
   if (!isContentfulConfigured || !contentfulClient) {
     return Array.from(
@@ -375,4 +340,10 @@ export async function getFeaturedProducts(): Promise<Product[]> {
 export async function getProductBySlug(slug: string): Promise<Product | null> {
   const all = await getAllProducts();
   return all.find((p) => p.slug === slug) || null;
+}
+
+export function getPriceBounds(products: Product[]): [number, number] {
+  if (products.length === 0) return [0, 0];
+  const prices = products.map((p) => p.price);
+  return [Math.min(...prices), Math.max(...prices)];
 }

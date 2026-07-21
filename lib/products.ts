@@ -1,5 +1,6 @@
 import { contentfulClient, isContentfulConfigured } from "./contentful";
 import { Product, Category, SubCategory } from "@/types/product";
+import { getDiscountedPrice } from "./utils";
 
 // Fallback demo data so the site renders immediately, before Contentful
 // is wired up. Once you add real entries in Contentful this is ignored.
@@ -150,6 +151,7 @@ function mapEntryToProduct(entry: any): Product {
     authenticity: f.authenticity,
     description: f.description,
     price: f.price,
+    discountPercent: f.discountPercent || 0,
     images: images.length
       ? images
       : [{ url: "/placeholder.jpg", alt: f.title }],
@@ -344,6 +346,8 @@ export async function getProductBySlug(slug: string): Promise<Product | null> {
 
 export function getPriceBounds(products: Product[]): [number, number] {
   if (products.length === 0) return [0, 0];
-  const prices = products.map((p) => p.price);
+  const prices = products.map((p) =>
+    getDiscountedPrice(p.price, p.discountPercent),
+  );
   return [Math.min(...prices), Math.max(...prices)];
 }

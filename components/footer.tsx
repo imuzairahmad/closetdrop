@@ -43,6 +43,11 @@ export function Footer() {
                 Contact
               </Link>
             </li>
+            <li>
+              <Link href="/return-policy" className="hover:text-foreground">
+                Refund & Return Policy
+              </Link>
+            </li>
           </ul>
         </div>
 

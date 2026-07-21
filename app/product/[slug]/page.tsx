@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import { getAllProducts, getProductBySlug } from "@/lib/products";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { formatPKR } from "@/lib/utils";
+import { formatPKR, getDiscountedPrice } from "@/lib/utils";
 import { CheckCircle2, ShieldCheck, Ruler } from "lucide-react";
 import ProductGallery from "@/components/product-gallery";
 
@@ -21,8 +21,11 @@ export default async function ProductPage({
   const product = await getProductBySlug(params.slug);
   if (!product) return notFound();
 
+  const hasDiscount = !!product.discountPercent && product.discountPercent > 0;
+  const finalPrice = getDiscountedPrice(product.price, product.discountPercent);
+
   const waMessage = encodeURIComponent(
-    `Hi! I'm interested in "${product.title}" (${formatPKR(product.price)}) from Closetdrop.`,
+    `Hi! I'm interested in "${product.title}" (${formatPKR(finalPrice)}) from Closetdrop.`,
   );
 
   return (
@@ -61,12 +64,28 @@ export default async function ProductPage({
             <Badge variant="secondary" className="capitalize">
               {product.category}
             </Badge>
+            {hasDiscount && (
+              <Badge variant="destructive" className="uppercase">
+                -{product.discountPercent}% off
+              </Badge>
+            )}
           </div>
 
           <div className="mt-6 flex items-baseline gap-3">
-            <span className="text-3xl font-black">
-              {formatPKR(product.price)}
-            </span>
+            {hasDiscount ? (
+              <>
+                <span className="text-3xl font-black text-red-600">
+                  {formatPKR(finalPrice)}
+                </span>
+                <span className="text-lg text-muted-foreground line-through">
+                  {formatPKR(product.price)}
+                </span>
+              </>
+            ) : (
+              <span className="text-3xl font-black">
+                {formatPKR(product.price)}
+              </span>
+            )}
           </div>
 
           <div className="mt-6 space-y-3 border-y border-border py-6">

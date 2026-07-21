@@ -2,7 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Product } from "@/types/product";
 import { Badge } from "@/components/ui/badge";
-import { formatPKR } from "@/lib/utils";
+import { formatPKR, getDiscountedPrice } from "@/lib/utils";
 
 interface ProductCardProps {
   product: Product;
@@ -11,6 +11,11 @@ interface ProductCardProps {
 
 export function ProductCard({ product, priority = false }: ProductCardProps) {
   const img = product.images[0];
+  const hasDiscount = !!product.discountPercent && product.discountPercent > 0;
+  const discountedPrice = getDiscountedPrice(
+    product.price,
+    product.discountPercent,
+  );
 
   return (
     <Link href={`/product/${product.slug}`} className="group block">
@@ -34,6 +39,11 @@ export function ProductCard({ product, priority = false }: ProductCardProps) {
           <Badge variant="secondary" className="uppercase text-[10px]">
             {product.subCategory}
           </Badge>
+          {hasDiscount && (
+            <Badge variant="destructive" className="uppercase text-[10px]">
+              -{product.discountPercent}%
+            </Badge>
+          )}
         </div>
       </div>
 
@@ -45,7 +55,20 @@ export function ProductCard({ product, priority = false }: ProductCardProps) {
           {product.title}
         </h3>
         <div className="flex items-center gap-2 pt-1">
-          <span className="text-sm font-bold">{formatPKR(product.price)}</span>
+          {hasDiscount ? (
+            <>
+              <span className="text-sm font-bold text-red-600">
+                {formatPKR(discountedPrice)}
+              </span>
+              <span className="text-xs text-muted-foreground line-through">
+                {formatPKR(product.price)}
+              </span>
+            </>
+          ) : (
+            <span className="text-sm font-bold">
+              {formatPKR(product.price)}
+            </span>
+          )}
         </div>
       </div>
     </Link>

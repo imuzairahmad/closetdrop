@@ -26,4 +26,5 @@ export interface Product {
   images: ProductImage[];
   featured?: boolean;
   sold?: boolean;
+  discountPercent?: number;
 }

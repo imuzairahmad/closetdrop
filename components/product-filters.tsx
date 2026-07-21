@@ -3,6 +3,7 @@
 import { useMemo } from "react";
 import { Product, SizeStandard, SubCategory } from "@/types/product";
 import { getPriceBounds } from "@/lib/products";
+import { getDiscountedPrice } from "@/lib/utils";
 import { extractUSSize, convertUSShoeSize } from "@/lib/size-conversion";
 import { Button } from "@/components/ui/button";
 
@@ -44,7 +45,9 @@ export function applyFilters(products: Product[], filters: Filters): Product[] {
       if (resolved !== filters.size) return false;
     }
 
-    if (p.price < filters.minPrice || p.price > filters.maxPrice) return false;
+    const effectivePrice = getDiscountedPrice(p.price, p.discountPercent);
+    if (effectivePrice < filters.minPrice || effectivePrice > filters.maxPrice)
+      return false;
 
     return true;
   });
@@ -104,7 +107,7 @@ export function ProductFilters({
         </select>
       </div>
 
-      {/* Size standard — reserve the slot even when hidden, to keep grid stable */}
+      {/* Size standard */}
       <div className="flex flex-col gap-1 min-h-[64px]">
         {showSizeFilter && (
           <>
